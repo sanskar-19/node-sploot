@@ -1,23 +1,28 @@
-// const express = require("express");
-// const router = express.Router();
-// const errors = require("http-errors");
-// const validation = require("../utils/middlewares/validation");
-// const schema = require("../utils/validationSchemas/auth");
+const express = require("express");
+const router = express.Router();
+const errors = require("http-errors");
 
-// router.get("/article", (req, res) => {
-//   res.send("Listening for get user");
-// });
+// Validation
+const validation = require("../utils/middlewares/validation");
+const schema = require("../utils/validationSchemas/article");
 
-// // Signup api
-// router.post("/article", validation(schema.signup), (req, res) => {
-//   console.log(req.body);
-//   res.status(201).send("User Added Successfully");
-// });
+// Model
+const Article = require("../models/article.model");
 
-// // Login api
-// router.post("/login", validation(schema.login), (req, res) => {});
+// Routes
+router.get("/articles", (req, res) => {
+  res.send("Listening for get articles");
+});
 
-// // Update profile api
-// router.put("/users/:userId", validation(schema.profile), (req, res) => {});
+// Create new article api
+router.post(
+  "/users/:userId/article",
+  validation(schema.newArticle),
+  (req, res, next) => {
+    console.log(req.params.userId);
+    console.log(req.body);
+    res.status(201).send("User Added Successfully");
+  }
+);
 
-// module.exports = router;
+module.exports = router;

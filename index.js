@@ -10,6 +10,7 @@ app.use(express.json());
 app.use(bodyparser.urlencoded({ extended: true }));
 
 app.use("/api", require("./server/routes/auth.routes"));
+app.use("/api", require("./server/routes/article.routes"));
 app.get("/", (req, res) => {
   res.send("Listening");
 });
