@@ -11,9 +11,39 @@ const User = require("../models/user.model");
 const { signAccessToken } = require("../utils/jwt/index");
 const jwt = require("../utils/jwt/index");
 
-router.get("/user", (req, res) => {
-  res.send("Listening for get user");
-});
+router.put(
+  "/users/:userId",
+  jwt.verifyAccessToken,
+  validation(schema.profile),
+  async (req, res, next) => {
+    try {
+      if (req.payload.userId != req.params.userId)
+        throw createErrors.NotFound("User not found");
+
+      const { name, age } = req.body;
+      if (!req.params.userId.match(/^[0-9a-fA-F]{24}$/)) {
+        throw createErrors.BadRequest("Invalid User Id");
+      }
+      const user = await User.findById(req.params.userId);
+      if (!user) throw createErrors.NotFound("User not found");
+
+      const updatedUser = await User.updateOne(
+        { _id: req.params.userId },
+        { $set: { name, age } },
+        {}
+      );
+      const updatedUserDetails = await User.findById(req.params.userId);
+      res.status(201).send({
+        statusCode: 201,
+        data: { user: updatedUserDetails },
+        error: null,
+        message: "User Updated Successfully",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 // Signup api
 router.post("/signup", validation(schema.signup), async (req, res, next) => {
