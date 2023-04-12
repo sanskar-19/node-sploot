@@ -35,7 +35,7 @@ router.post("/signup", validation(schema.signup), async (req, res, next) => {
     const accessToken = await signAccessToken(savedUser.id);
     res.send({
       statusCode: 201,
-      data: { token: accessToken },
+      data: { id: savedUser.id, token: accessToken },
       message: "User Created Successfully",
       error: null,
     });
@@ -61,7 +61,7 @@ router.post("/login", validation(schema.login), async (req, res, next) => {
     if (isMatched) {
       res.status(200).send({
         statusCode: 200,
-        data: { token: await signAccessToken(user.id) },
+        data: { id: user.id, token: await signAccessToken(user.id) },
         message: "Logged in successfully",
         error: null,
       });
