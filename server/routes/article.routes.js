@@ -42,7 +42,7 @@ async function fetchAuthorDetails(AuthorId) {
 
 // Create new article api
 router.post(
-  "/users/:userId/article",
+  "/users/:userId/articles",
   verifyAccessToken,
   validation(schema.newArticle),
   async (req, res, next) => {
