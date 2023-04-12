@@ -10,10 +10,35 @@ const schema = require("../utils/validationSchemas/article");
 const Article = require("../models/article.model");
 const { verifyAccessToken } = require("../utils/jwt/index");
 const User = require("../models/user.model");
-// Routes
-router.get("/articles", (req, res) => {
-  res.send("Listening for get articles");
+
+// Fetch all articles
+router.get("/articles", verifyAccessToken, async (req, res, next) => {
+  try {
+    let articleList = await Article.find();
+
+    // Creating article items array
+    let data = new Array();
+    for (let i = 0; i < articleList.length; i++) {
+      let info = await fetchAuthorDetails(articleList[i].author);
+      let article = { article: articleList[i], author: info };
+      data.push(article);
+    }
+    res.status(200).send({
+      statusCode: 200,
+      data: { articles: data },
+      message: "Fetched all articles",
+      error: null,
+    });
+  } catch (error) {
+    next(error);
+  }
 });
+
+// Function to fetch user info
+async function fetchAuthorDetails(AuthorId) {
+  const user = await User.findById(AuthorId);
+  return { name: user.name, email: user.email, age: user.age };
+}
 
 // Create new article api
 router.post(
@@ -21,8 +46,11 @@ router.post(
   verifyAccessToken,
   validation(schema.newArticle),
   async (req, res, next) => {
-    console.log(req);
+    // console.log(req);
     try {
+      if (req.payload.userId != req.params.userId)
+        throw createErrors.NotFound("User not found");
+
       const { title, description } = req.body;
       if (!req.params.userId.match(/^[0-9a-fA-F]{24}$/)) {
         throw createErrors.BadRequest("Invalid User Id");
