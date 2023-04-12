@@ -9,7 +9,7 @@ app = express();
 app.use(express.json());
 app.use(bodyparser.urlencoded({ extended: true }));
 
-app.use("/api", require("./server/routes/auth.router"));
+app.use("/api", require("./server/routes/auth.routes"));
 app.get("/", (req, res) => {
   res.send("Listening");
 });
